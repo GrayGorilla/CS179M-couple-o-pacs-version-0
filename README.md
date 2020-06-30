@@ -17,6 +17,9 @@ Pieter Abbeel (pabbeel@cs.berkeley.edu).
 This version (cshelton/pacman-ctf github repo) was modified by Christian
 Shelton (cshelton@cs.ucr.edu) on June 23, 2020 to run under Python 3.
 
+### Team
+Team Name:  Couple O' Pacs  
+Members:  Nathan D Brennan & Seung Eun Ha
 
 ## Getting Started
 (much of this is from the original HTML documentation, in origdoc/)
