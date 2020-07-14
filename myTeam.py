@@ -51,6 +51,10 @@ class AgentZero(CaptureAgent):
 
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
+    # Find base border
+    xStart = self.start[0]
+    if xStart == 1: self.basePos = (15.0, 7.0)
+    else: self.basePos = (16.0, 8.0)
     CaptureAgent.registerInitialState(self, gameState)
 
   # Picks among the actions with the highest Q(s, a)
@@ -66,13 +70,13 @@ class AgentZero(CaptureAgent):
     bestActions = [a for a, v in zip(actions, values) if v == maxValue]
     foodLeft = len(self.getFood(gameState).asList())
 
-    print('~~~~~~ Begin ~~~~~')
-    print('Best Actions:', bestActions)
-    print('~~~~~~ End ~~~~~~~')
+    # print('~~~~~~ Begin ~~~~~')
+    # print('Best Actions:', bestActions)
+    # print('~~~~~~ End ~~~~~~~')
 
     # time.sleep(1)
 
-    if foodLeft <= 2:
+    if foodLeft == 0:
       bestDist = 9999
       for action in actions:
         successor = self.getSuccessor(gameState, action)
@@ -98,12 +102,12 @@ class AgentZero(CaptureAgent):
   def evaluate(self, gameState, action):
     features = self.getFeatures(gameState, action)
     weights = self.getWeights(gameState, action)
-    print('Action:', action)
-    # print('GameState:', gameState, sep='\n')
-    print('Features:', features)
-    print('Weights:', weights)
-    print('~ features * weights:', features * weights)
-    print('========================')
+    # print('Action:', action)
+    # # print('GameState:', gameState, sep='\n')
+    # print('Features:', features)
+    # print('Weights:', weights)
+    # print('~ features * weights:', features * weights)
+    # print('========================')
     return features * weights
 
   # Returns a counter of features for the state
@@ -122,19 +126,45 @@ class OffensiveAgentZ(AgentZero):
   def getFeatures(self, gameState, action):
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
+
+    myState = successor.getAgentState(self.index)
+    myPos = myState.getPosition()
+
     foodList = self.getFood(successor).asList()
-    features['successorScore'] = -len(foodList)
+    features['successorScore'] = len(foodList)
 
     # Distance to nearest food
     if len(foodList) > 0:
       myPos = successor.getAgentState(self.index).getPosition()
       minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
       features['distanceToFood'] = minDistance
+
+    # Deposit priority
+    if (myState.numCarrying > 0):
+      # Closest distance to base
+      depositDist = self.getMazeDistance(myPos, self.basePos)
+      dpstPriority = myState.numCarrying * depositDist
+      features['dpstPriority'] = dpstPriority
+
+    # Proximity to nearest enemy ghost when pacman
+    if myState.isPacman:
+      enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
+      ghosts = [x for x in enemies if not x.isPacman and x.scaredTimer == 0 and x.getPosition() != None]
+      features['numGhosts'] = len(ghosts)
+      if len(ghosts) > 0:
+        dists = [self.getMazeDistance(myPos, x.getPosition()) for x in ghosts]
+        features['ghostDistance'] = min(dists)
+
+    # Avoid reversing or stopping if affordable
+    if action == Directions.STOP: features['stop'] = 1
+    rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+    if action == rev: features['reverse'] = 1
+    
     return features
 
   def getWeights(self, gameState, action):
-    print('===== Ally Offense =====')
-    return {'successorScore': 100, 'distanceToFood': -1}
+    # print('===== Ally Offense =====')
+    return {'numGhosts': -500, 'ghostDistance': 6, 'dpstPriority': -1, 'successorScore': -100, 'distanceToFood': -3, 'reverse': -2, 'stop': -1000}
 
 class DefensiveAgentZ(AgentZero):
   
@@ -155,7 +185,7 @@ class DefensiveAgentZ(AgentZero):
     features['numInvaders'] = len(invaders)
 
     if len(invaders) > 0:
-      print("invador alert")
+      # print("invador alert")
       howFarAwayInvaders = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
       closestInvader = min(howFarAwayInvaders)
       features['invaderDistance'] = closestInvader
@@ -170,7 +200,7 @@ class DefensiveAgentZ(AgentZero):
     return features
 
   def getWeights(self, gameState, action):
-    print('===== Ally Defense =====')
+    # print('===== Ally Defense =====')
     return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -100, 'stop': -200, 'reverse': -2, 'capsuleDistance':-10}
 
 
