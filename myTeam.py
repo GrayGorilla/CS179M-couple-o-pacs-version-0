@@ -66,6 +66,12 @@ class AgentZero(CaptureAgent):
     bestActions = [a for a, v in zip(actions, values) if v == maxValue]
     foodLeft = len(self.getFood(gameState).asList())
 
+    print('~~~~~~ Begin ~~~~~')
+    print('Best Actions:', bestActions)
+    print('~~~~~~ End ~~~~~~~')
+
+    # time.sleep(1)
+
     if foodLeft <= 2:
       bestDist = 9999
       for action in actions:
@@ -92,6 +98,12 @@ class AgentZero(CaptureAgent):
   def evaluate(self, gameState, action):
     features = self.getFeatures(gameState, action)
     weights = self.getWeights(gameState, action)
+    print('Action:', action)
+    # print('GameState:', gameState, sep='\n')
+    print('Features:', features)
+    print('Weights:', weights)
+    print('~ features * weights:', features * weights)
+    print('========================')
     return features * weights
 
   # Returns a counter of features for the state
@@ -108,10 +120,21 @@ class AgentZero(CaptureAgent):
 class OffensiveAgentZ(AgentZero):
 
   def getFeatures(self, gameState, action):
-    return AgentZero.getFeatures(self, gameState, action) # todo: replace with offensive strategy
+    features = util.Counter()
+    successor = self.getSuccessor(gameState, action)
+    foodList = self.getFood(successor).asList()
+    features['successorScore'] = -len(foodList)
+
+    # Distance to nearest food
+    if len(foodList) > 0:
+      myPos = successor.getAgentState(self.index).getPosition()
+      minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
+      features['distanceToFood'] = minDistance
+    return features
 
   def getWeights(self, gameState, action):
-    return AgentZero.getWeights(self, gameState, action)  # todo: replace with offensive strategy
+    print('===== Ally Offense =====')
+    return {'successorScore': 100, 'distanceToFood': -1}
 
 class DefensiveAgentZ(AgentZero):
   
@@ -119,6 +142,7 @@ class DefensiveAgentZ(AgentZero):
     return AgentZero.getFeatures(self, gameState, action) # todo: replace with defensive strategy
 
   def getWeights(self, gameState, action):
+    print('===== Ally Defense =====')
     return AgentZero.getWeights(self, gameState, action)  # todo: replace with defensive strategy
 
 
