@@ -114,6 +114,7 @@ class OffensiveAgentZ(AgentZero):
     return AgentZero.getWeights(self, gameState, action)  # todo: replace with offensive strategy
 
 class DefensiveAgentZ(AgentZero):
+  
   def getFeatures(self, gameState, action):
     return AgentZero.getFeatures(self, gameState, action) # todo: replace with defensive strategy
 
