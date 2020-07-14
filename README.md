@@ -21,6 +21,14 @@ Shelton (cshelton@cs.ucr.edu) on June 23, 2020 to run under Python 3.
 Team Name:  Couple O' Pacs  
 Members:  Nathan D Brennan & Seung Eun Ha
 
+### Version 0 Stragegy and Assessment
+Offensive: Prioritize increasing score. Avoiding enemy ghosts unless pacman can eat them (after consuming capsule). Minimize distance to food. Avoid stopping or reversing if affordable.  
+Defensive: Defend the capule unless invader exists. If invadors exist, it priortize going after the closest invador.  
+
+We decided to base off the baselineTeam to start with. Then we decided to add more strategy on top of it.
+Offensive is done by Nate.
+Defensive is done by Siena.
+
 ## Getting Started
 (much of this is from the original HTML documentation, in origdoc/)
 
