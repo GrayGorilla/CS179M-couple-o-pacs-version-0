@@ -29,6 +29,10 @@ We decided to base off the baselineTeam to start with. Then we decided to add mo
 Offensive is done by Nate.
 Defensive is done by Siena.
 
+We did not fully finish the project, therefore we have not done the full integration test.
+
+In future, we might diverge from baselineTeam's strategy. This was just to understand the code better. 
+
 ## Getting Started
 (much of this is from the original HTML documentation, in origdoc/)
 
