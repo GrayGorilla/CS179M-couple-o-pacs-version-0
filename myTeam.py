@@ -77,7 +77,7 @@ class AgentZero(CaptureAgent):
           bestDist = dist
       return bestAction
 
-    return random.choice(actions)
+    return random.choice(bestActions)
 
   # Finds next successor which is a grid position (location tuple)
   def getSuccessor(self, gameState, action):
