@@ -139,16 +139,44 @@ class OffensiveAgentZ(AgentZero):
 class DefensiveAgentZ(AgentZero):
   
   def getFeatures(self, gameState, action):
-    return AgentZero.getFeatures(self, gameState, action) # todo: replace with defensive strategy
+    features = util.Counter()
+    successor = self.getSuccessor(gameState, action)
+
+    myState = successor.getAgentState(self.index)
+    myPos = myState.getPosition()
+
+    # Computes whether we're on defense (1) or offense (0)
+    features['onDefense'] = 1
+    if myState.isPacman: features['onDefense'] = 0
+
+    # Computes distance to invaders we can see
+    enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
+    invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
+    features['numInvaders'] = len(invaders)
+
+    if len(invaders) > 0:
+      print("invador alert")
+      howFarAwayInvaders = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
+      closestInvader = min(howFarAwayInvaders)
+      features['invaderDistance'] = closestInvader
+    else:
+      capsulePosition = self.getCapsulesYouAreDefending(successor)
+      howFarAwayCapsule = self.getMazeDistance(myPos, capsulePosition[0])
+      features['capsuleDistance'] = howFarAwayCapsule
+    if action == Directions.STOP: features['stop'] = 1
+    rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+    if action == rev: features['reverse'] = 1
+
+    return features
 
   def getWeights(self, gameState, action):
     print('===== Ally Defense =====')
-    return AgentZero.getWeights(self, gameState, action)  # todo: replace with defensive strategy
+    return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -100, 'stop': -200, 'reverse': -2, 'capsuleDistance':-10}
 
 
-###############
-# Dummy Agent #
-###############
+# ###############
+# # Dummy Agent #
+# ###############
 
 class DummyAgent(CaptureAgent):
   """
