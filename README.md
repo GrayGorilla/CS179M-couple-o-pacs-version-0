@@ -22,16 +22,15 @@ Team Name:  Couple O' Pacs
 Members:  Nathan D Brennan & Seung Eun Ha
 
 ### Version 0 Stragegy and Assessment
-Offensive: Prioritize increasing score. Avoiding enemy ghosts unless pacman can eat them (after consuming capsule). Minimize distance to food. Avoid stopping or reversing if affordable.  
-Defensive: Defend the capule unless invader exists. If invadors exist, it priortize going after the closest invador.  
+Offensive: Prioritize increasing score. Focus on depositing food to mitigate point loss on death; prioritize based on amount of food carried and distance to home base. Avoiding enemy ghosts unless pacman can eat them (after consuming capsule). Minimize distance to food. Avoid stopping or reversing if affordable. Especially stopping.  
 
-We decided to base off the baselineTeam to start with. Then we decided to add more strategy on top of it.
-Offensive is done by Nate.
-Defensive is done by Siena.
+Defensive: Defend the capule unless invader exists. If invaders exist, it priortize going after the closest invader.  
 
-We did not fully finish the project, therefore we have not done the full integration test.
+We split the work by having Nate develop the Offensive Agent, while Siena develops the Defensive Agent.  
 
-In future, we might diverge from baselineTeam's strategy. This was just to understand the code better. 
+Agent Zero performs pretty well against baseline, wins every time. Of course there's room for improvment, as some strategies are hard-coded and static.  
+
+In future, we might diverge from baselineTeam's strategy. This was just to understand the code better. We may also attempt more dynamic strategies.  
 
 ## Getting Started
 (much of this is from the original HTML documentation, in origdoc/)
