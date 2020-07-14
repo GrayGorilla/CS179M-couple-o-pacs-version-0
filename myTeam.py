@@ -13,16 +13,18 @@
 
 
 from captureAgents import CaptureAgent
-import random, time, util
+import distanceCalculator
+import random, time, util, sys
 from game import Directions
 import game
+from util import nearestPoint
 
 #################
 # Team creation #
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first = 'DummyAgent', second = 'DummyAgent'):
+               first = 'OffensiveAgentZ', second = 'DefensiveAgentZ'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -44,6 +46,84 @@ def createTeam(firstIndex, secondIndex, isRed,
 ##########
 # Agents #
 ##########
+
+class AgentZero(CaptureAgent):
+
+  def registerInitialState(self, gameState):
+    self.start = gameState.getAgentPosition(self.index)
+    CaptureAgent.registerInitialState(self, gameState)
+
+  # Picks among the actions with the highest Q(s, a)
+  def chooseAction(self, gameState):
+    actions = gameState.getLegalActions(self.index)
+
+    # Calculate evaluation time per move by uncommenting these lines
+    # start = time.time()
+    values = [self.evaluate(gameState, a) for a in actions]
+    # print('eval time for agent %d: %.4f' % (self.index, time.time() - start))
+
+    maxValue = max(values)
+    bestActions = [a for a, v in zip(actions, values) if v == maxValue]
+    foodLeft = len(self.getFood(gameState).asList())
+
+    if foodLeft <= 2:
+      bestDist = 9999
+      for action in actions:
+        successor = self.getSuccessor(gameState, action)
+        pos2 = successor.getAgentPosition(self.index)
+        dist = self.getMazeDistance(self.start, pos2)
+        if dist < bestDist:
+          bestAction = action
+          bestDist = dist
+      return bestAction
+
+    return random.choice(actions)
+
+  # Finds next successor which is a grid position (location tuple)
+  def getSuccessor(self, gameState, action):
+    successor = gameState.generateSuccessor(self.index, action)
+    pos = successor.getAgentState(self.index).getPosition()
+    if pos != nearestPoint(pos):
+      return successor.generateSuccessor
+    else:
+      return successor
+  
+  # Computes a linear combination of features and weights
+  def evaluate(self, gameState, action):
+    features = self.getFeatures(gameState, action)
+    weights = self.getWeights(gameState, action)
+    return features * weights
+
+  # Returns a counter of features for the state
+  def getFeatures(self, gameState, action):
+    features = util.Counter()
+    successor = self.getSuccessor(gameState, action)
+    features['successorScore'] = self.getScore(successor)
+    return features
+
+  # Normally weights do not depend on gamestate.  They can be a counter or a dictionary.
+  def getWeights(self, gameState, action):
+    return {'sucessorScore': 1.0}
+
+class OffensiveAgentZ(AgentZero):
+
+  def getFeatures(self, gameState, action):
+    return AgentZero.getFeatures(self, gameState, action) # todo: replace with offensive strategy
+
+  def getWeights(self, gameState, action):
+    return AgentZero.getWeights(self, gameState, action)  # todo: replace with offensive strategy
+
+class DefensiveAgentZ(AgentZero):
+  def getFeatures(self, gameState, action):
+    return AgentZero.getFeatures(self, gameState, action) # todo: replace with defensive strategy
+
+  def getWeights(self, gameState, action):
+    return AgentZero.getWeights(self, gameState, action)  # todo: replace with defensive strategy
+
+
+###############
+# Dummy Agent #
+###############
 
 class DummyAgent(CaptureAgent):
   """
